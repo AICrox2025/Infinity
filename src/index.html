@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Infinity Browser</title>
+  <link rel="stylesheet" href="styles/style.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background-color: #05070f;
+      color: white;
+      overflow: hidden;
+    }
+
+    /* --- PANEL SŤAHOVANIA (Chrome Style) --- */
+    #downloads-bar {
+      /* display: none; */ /* Bude ovládané cez render.js */
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 50px; /* Výška celej lišty */
+      background-color: #202124; /* Tmavá farba lišty */
+      border-top: 1px solid #11141f;
+      z-index: 9999;
+      display: flex; /* Zobrazené defaultne kvôli flexbox layoutu body */
+      align-items: center;
+      padding: 0 10px;
+      overflow-x: auto;
+      gap: 10px; /* Medzera medzi jednotlivými stiahnutými súbormi */
+    }
+
+    /* Štýl pre JEDNOTLIVÚ položku sťahovania (bude generovaná v render.js) */
+    .download-item {
+      display: flex;
+      align-items: center;
+      background-color: #3C4043; /* Farba pozadia položky */
+      padding: 5px 10px;
+      border-radius: 4px;
+      position: relative;
+      cursor: pointer;
+      min-width: 250px;
+      height: 35px;
+      overflow: hidden;
+      font-size: 13px;
+    }
+
+    .download-item .filename {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-left: 5px;
+      flex-grow: 1;
+    }
+
+    .download-item .close-btn {
+      background: none;
+      border: none;
+      color: white;
+      margin-left: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    /* Progress bar vnútri položky */
+    .download-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      background-color: #0078d7; /* Modrá farba progresu */
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* --- TOP BAR --- */
+    header.top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 12px;
+      background-color: #11141f;
+    }
+
+    .top .left,
+    .top .right {
+      display: flex;
+      align-items: center;
+    }
+
+    .top .left img,
+    .top .left button {
+      width: 28px;
+      height: 28px;
+      margin-right: 6px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: white; /* pridané pre viditeľnosť šípok */
+    }
+
+    .url-box {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      margin: 0 10px;
+      background-color: #1c1e2a;
+      border-radius: 6px;
+      padding: 4px 8px;
+    }
+
+    .url-box input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: none;
+      color: white;
+      font-size: 14px;
+      padding-left: 5px;
+    }
+
+    .top .right select {
+      margin-left: 5px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: none;
+      font-size: 14px;
+      background-color: #1c1e2a;
+      color: white;
+      cursor: pointer;
+    }
+
+    .top .right img {
+      width: 24px;
+      height: 24px;
+    }
+
+    /* --- HOME SECTION --- */
+    #home {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background-color: #1c1e2a;
+    }
+
+    .search {
+      display: flex;
+      width: 50%;
+      max-width: 600px;
+      margin-top: 50px;
+    }
+
+    .search input {
+      flex: 1;
+      padding: 12px 15px;
+      font-size: 16px;
+      border-radius: 8px 0 0 8px;
+      border: none;
+      outline: none;
+      color: white;
+      background-color: #2a2c3b;
+    }
+
+    .search button {
+      padding: 12px 20px;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      background-color: #0078d7;
+      color: white;
+      border-radius: 0 8px 8px 0;
+      transition: background 0.2s;
+    }
+
+    .search button:hover {
+      background-color: #005ea3;
+    }
+
+    /* --- WEBVIEW --- */
+    webview {
+      flex: 1;
+      display: none;
+      width: 100%;
+      height: 100%;
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- ODSTRÁNENÝ STARÝ CONTAINER -->
+<!-- <div id="download-progress-container"> </div> -->
+
+<header class="top">
+  <!-- ... (zvyšok vašej navigácie) ... -->
+  <div class="left">
+    <img id="homeBtn" src="assets/home.png" title="Home">
+    <img id="chatBtn" src="assets/rocket.png" title="Chat">
+    <button id="back">←</button>
+    <button id="forward">→</button>
+  </div>
+
+  <div class="url-box">
+    <input id="url" placeholder="Search or enter address">
+  </div>
+
+  <div class="right">
+    <img id="engineIcon" src="assets/google.svg" alt="Engine">
+    <select id="engineSelect">
+      <option value="google">Google</option>
+      <option value="duckduckgo">DuckDuckGo</option>
+    </select>
+  </div>
+</header>
+
+<section id="home">
+  <div class="search">
+    <input id="searchInput" placeholder="Merry christmas!">
+    <button id="searchBtn">Search</button>
+  </div>
+</section>
+
+<!-- Pridaný atribút download-at-path pre lepšiu správu sťahovania -->
+<webview id="webview" webpreferences="nativeWindowOpen=true, nodeIntegration=no" allowpopups></webview>
+
+<!-- NOVÝ CONTAINER PRE SPODNÚ LIŠTU SŤAHOVANIA (Chrome Style) -->
+<div id="downloads-bar" style="display: none;"></div>
+
+<script src="render.js"></script>
+</body>
+</html>
+
