@@ -1,0 +1,91 @@
+* {
+  box-sizing: border-box;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #05070f;
+  color: white;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* TOP */
+.top {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 12px;
+  background: rgba(10,15,30,0.9);
+  backdrop-filter: blur(12px);
+}
+
+.top button {
+  background: #151a33;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.url-box {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #151a33;
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+.url-box input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: white;
+  outline: none;
+}
+
+/* ENGINE */
+.engine {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.engine img {
+  width: 18px;
+}
+
+/* HOME */
+#home {
+  height: calc(100vh - 56px);
+  background: url("../assets/background.jpg") center/cover no-repeat;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo {
+  width: 160px;
+  margin-bottom: 30px;
+}
+
+.search {
+  display: flex;
+  gap: 10px;
+  background: rgba(0,0,0,0.6);
+  padding: 16px;
+  border-radius: 18px;
+}
+
+/* WEBVIEW */
+webview {
+  display: none;
+  height: calc(100vh - 56px);
+  width: 100%;
+}
